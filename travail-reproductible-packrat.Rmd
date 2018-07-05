@@ -156,6 +156,8 @@ class: inverse, center, middle
 
 # Les problèmes?
 
+???
+
 - On aborde 3 problèmes majeurs qu'on rencontre quand on veut mettre du R en production
 
 ---
@@ -307,6 +309,8 @@ class: inverse, center, middle
 
 # Comment ça marche?
 
+???
+
 - Principales fonctions
 - Exemple simple
 
@@ -326,7 +330,7 @@ class: inverse, center, middle
 - `packrat/src/`  
  Fichiers sources pour installer les paquetages requis
  
- ???
+???
  
 - Au minimum, le paquetage `packrat` est requis par le projet
 - `lib-ext` est souvent utilisé pour les gros paquetages et ceux qui ne sont pas directement reliés au projet (par exemple `devtools`, `knitr`, `Rmarkdown`)
