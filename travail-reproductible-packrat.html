@@ -25,6 +25,15 @@ class: title-slide
 
 # 5 juillet 2018
 
+???
+
+- Ma vie personnelle (un peu)
+- Mon parcours académique
+- Mon parcours professionnel jusqu'à maintenant
+- Ma motivation (R à Québec)
+- L'objectif de ma présentation : Convaincre que l'utilisation de **packrat** permet de rendre un projet plus facilement isolable, transportable et reproductible
+- Super important, particulièrement quand on veut mettre un projet dans la chaîne de production
+
 ---
 
 class: inverse, center, middle
@@ -34,6 +43,7 @@ background-size: cover
 
 ???
 
+- Éthymologie des mots, particulièrement les noms de paquetage
 - Famille de petits rongeurs appelée **Neotoma** dont fait partie le rat à queue touffue (mon préféré)
 
 Image credit: [Odyssey](https://www.theodysseyonline.com/9-struggles-of-being-pack-rat)
@@ -65,6 +75,10 @@ background-position: 50% 80%
 
 # Ce que l'actuaire pense
 
+???
+
+- Rien de compliqué, il y a des paquetages inclus avec la distribution et des extensions téléchargeables à la pièce
+
 ---
 
 background-image: url("pics/package-multi-user.pdf")
@@ -72,6 +86,12 @@ background-size: 80%
 background-position: 50% 80%
 
 # Ce que l'équipe d'actuaires pense
+
+???
+
+- Complication : Les paquetages ajoutés à la pièce sont, par défaut, installés dans le répertoire personnel de l'utilisateur qui exécute l'installation
+- On peut altérer ce comportement en créant des librairies partagées entre utilisateurs
+- Peut être tannant si différent utilisateurs veulent utiliser différentes versions d'un paquetage (version stable du CRAN vs version développement de GitHub)
 
 ---
 
@@ -81,6 +101,11 @@ background-position: 50% 80%
 
 # Ce que l'équipe agile d'actuaires pense
 
+???
+
+- On admet qu'un projet pourrait être utilisé par différents utilisateurs au besoin
+- Les différences dans les différentes librairies personnelles des utilisateurs peuvent changer le comportement d'un programme
+
 ---
 
 background-image: url("pics/package-implementation.pdf")
@@ -89,9 +114,21 @@ background-position: 50% 80%
 
 # Ce que l'équipe d'intégration pense
 
+???
+
+- Déjà des problèmes quand on pense au développement, imaginez si on regarde l'intégration d'un tel programme
+- Impossible de copier/coller la librairie d'extensions de paquetage, dépend du système d'exploitation
+
 ---
 
 # Ce que c'est réellement...
+
+???
+
+- On n'a même pas parlé de :
+ - Les différents entrepôts de paquetages qui existent
+ - Les dépendances à des paquetages du système d'exploitation
+ - L'appel de R à partir d'autres programmes
 
 ---
 
@@ -106,6 +143,8 @@ background-position: 50% 60%
 class: inverse, center, middle
 
 # Les problèmes?
+
+- On aborde 3 problèmes majeurs qu'on rencontre quand on veut mettre du R en production
 
 ---
 
@@ -135,7 +174,8 @@ background-size: cover
 
 ???
 
-- Collaboration entre utilisateurs sur différentes infrastructures
+- Collaboration entre utilisateurs sur différentes plateformes
+- Particulièrement Windows qui installe des *.dll un peu partout
 
 Image credit: [Designers Pics](http://www.designerspics.com/photographs/chained-hands/)
 
@@ -151,6 +191,7 @@ background-size: cover
 ???
 
 - On veut s'assurer que le projet soit reproductible dans le temps, peu importe comment les différents paquetages utilisés évoluent individuellement
+- Jamais un enjeu à court terme, doublement plus compliqué à gérer quand ça arrive
 
 Image credit: [NRI Achievers](http://nriachievers.in/andhra-pradesh-became-the-first-indian-state-to-launch-dna-index-system-for-profiling-of-criminals/)
 
@@ -159,6 +200,10 @@ Image credit: [NRI Achievers](http://nriachievers.in/andhra-pradesh-became-the-f
 class: inverse, center, middle
 
 # Les solutions!
+
+???
+
+- Il existe des solutions autres que l'utilisation de `packrat`, mais elles sont moins *clean* à mon goût
 
 ---
 
@@ -175,6 +220,7 @@ background-position: 50% 80%
 - Permet de choisir individuellement tous ses paquetages
 
 ## Désavantages
+- Contraintes opérationnelles tannantes (plusieurs sources de problèmes potentiels)
 - Non transportable d'un OS à l'autre
 - Non reproductible (on ne garde pas les sources des paquetages)
 
@@ -188,9 +234,9 @@ background-position: 50% 80%
 
 ???
 
-Photo quotidienne du CRAN depuis le 17 septembre 2014
-
-Règle les trois problèmes, mais...
+- Photo quotidienne du CRAN depuis le 17 septembre 2014
+- Déjà une solution pas si mal en entreprise
+- Règle les trois problèmes, mais...
 
 ## Avantages
 - Cohérence entre les utilisateurs
@@ -201,7 +247,7 @@ Règle les trois problèmes, mais...
 ## Désavantages
 - Contrainte d'un projet à l'autre (préférable d'utiliser la même photo avec tous les projets)
 - Contrainte dans le même projet si on veut faire évoluer certains paquetages
-- Moins transparent au niveau du projet (la date de la photo pourrait ne pas être gérée au niveau des projets)
+- Moins transparent au niveau du projet (la date de la photo pourrait être gérée au niveau du système par exemple)
 
 ---
 
@@ -234,6 +280,8 @@ background-position: 50% 80%
 
 ???
 
+- Paquetages isolés par projet
+
 ---
 
 class: center, middle
@@ -246,6 +294,9 @@ background-size: cover
 class: inverse, center, middle
 
 # Comment ça marche?
+
+- Principales fonctions
+- Exemple simple
 
 ---
 
@@ -262,6 +313,11 @@ class: inverse, center, middle
 
 - `packrat/src/`  
  Fichiers sources pour installer les paquetages requis
+ 
+ ???
+ 
+- Au minimum, le paquetage `packrat` est requis par le projet
+- `lib-ext` est souvent utilisé pour les gros paquetages et ceux qui ne sont pas directement reliés au projet (par exemple `devtools`, `knitr`, `Rmarkdown`)
 
 ---
 
@@ -348,6 +404,10 @@ snapshot.fields:
 
 5. Redémarrage de la session `R` en mode `packrat`
 
+???
+
+- Pour toute cette section, je présente le comportement par défaut, on peut le modifier en jouant avec les paramètres
+
 ---
 
 # `snapshot()`
@@ -361,7 +421,6 @@ snapshot.fields:
 ???
 
 - Exceptions pour la photo des paquetages : paquetages de priorité *base* ou *recommended*
-- Pour toute cette section, je présente le comportement par défaut, on peut le modifier en jouant avec les paramètres
 
 ---
 
