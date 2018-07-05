@@ -6,15 +6,40 @@ date: "5 juillet 2018"
 output:
   xaringan::moon_reader:
     lib_dir: libs
+    css: ["default", "default-fonts", "title-slide.css"]
     nature:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
+    includes:
+      in_header: header.html
+    seal: false
 ---
 
 ```{r setup, include=FALSE}
+
+library(callr)
+library(stringr)
+library(xaringan)
+library(caTools)
+
 options(htmltools.dir.version = FALSE)
+
 ```
+
+class: title-slide
+
+# Travail reproductible avec **packrat**
+
+## R à Montréal 2018
+
+# J.P. Le Cavalier
+
+# 5 juillet 2018
+
+---
+
+class: inverse, center, middle
 
 background-image: url("pics/packrat-animal.jpg")
 background-size: cover
@@ -27,6 +52,8 @@ Image credit: [Odyssey](https://www.theodysseyonline.com/9-struggles-of-being-pa
 
 ---
 
+class: inverse, center, middle
+
 background-image: url("pics/packrat-hoarding.jpg")
 background-size: cover
 
@@ -37,6 +64,166 @@ background-size: cover
 Image credit: [The Corvallis Advocate](http://www.corvallisadvocate.com/2013/0117-hoarding-officially-a-disorder)
 
 ---
+
+class: inverse, center, middle
+
+# Gestion classique des paquetages en R
+
+---
+
+background-image: url("pics/package-classic.pdf")
+background-size: 80%
+background-position: 50% 80%
+
+# Ce que l'actuaire pense
+
+---
+
+background-image: url("pics/package-multi-user.pdf")
+background-size: 80%
+background-position: 50% 80%
+
+# Ce que l'équipe d'actuaires pense
+
+---
+
+background-image: url("pics/package-shared-project.pdf")
+background-size: 80%
+background-position: 50% 80%
+
+# Ce que l'équipe agile d'actuaires pense
+
+---
+
+background-image: url("pics/package-implementation.pdf")
+background-size: 80%
+background-position: 50% 80%
+
+# Ce que l'équipe d'intégration pense
+
+---
+
+# Ce que c'est réellement...
+
+---
+
+background-image: url("pics/barney-gun-mouth.gif")
+background-size: 60%
+background-position: 50% 60%
+
+# Ce que c'est réellement...
+
+---
+
+class: inverse, center, middle
+
+# Les problèmes?
+
+---
+
+class: inverse, center, middle
+
+background-image: url("pics/dependances.jpg")
+background-size: cover
+
+# Les dépendances
+
+???
+
+- La dépendance d'un projet à l'autre
+- La dépendance entre les différents utilisateurs
+- On veut s'assurer que le fait de mettre à jour un paquetage pour un projet n'influencera pas les autres projets
+
+Image credit: [CBC Advisors](http://cbcadvisors.com/heroimage_services_international/)
+
+---
+
+class: inverse, center, middle
+
+background-image: url("pics/chained-hands.jpg")
+background-size: cover
+
+# La portabilité
+
+???
+
+- Collaboration entre utilisateurs sur différentes infrastructures
+
+Image credit: [Designers Pics](http://www.designerspics.com/photographs/chained-hands/)
+
+---
+
+class: inverse, center, middle
+
+background-image: url("pics/dna.jpg")
+background-size: cover
+
+# La reproductibilité
+
+???
+
+- On veut s'assurer que le projet soit reproductible dans le temps, peu importe comment les différents paquetages utilisés évoluent individuellement
+
+Image credit: [NRI Achievers](http://nriachievers.in/andhra-pradesh-became-the-first-indian-state-to-launch-dna-index-system-for-profiling-of-criminals/)
+
+---
+
+class: inverse, center, middle
+
+# Les solutions!
+
+---
+
+background-image: url("pics/package-self.pdf")
+background-size: 80%
+background-position: 50% 80%
+
+# Systèmes isolés
+
+???
+
+## Avantages
+- Règle le problème de l'isolement
+- Permet de choisir individuellement tous ses paquetages
+
+## Désavantages
+- Non transportable d'un OS à l'autre
+- Non reproductible (on ne garde pas les sources des paquetages)
+
+---
+
+background-image: url("pics/package-mran.pdf")
+background-size: 80%
+background-position: 50% 80%
+
+# Microsoft R Application Network (MRAN)
+
+???
+
+Photo quotidienne du CRAN depuis le 17 septembre 2014
+
+Règle les trois problèmes, mais...
+
+## Avantages
+- Cohérence entre les utilisateurs
+- Reproductiblité
+- Simplicité
+- Structure similaire aux autres logiciels commerciaux
+
+## Désavantages
+- Contrainte d'un projet à l'autre (préférable d'utiliser la même photo avec tous les projets)
+- Contrainte dans le même projet si on veut faire évoluer certains paquetages
+- Moins transparent au niveau du projet (la date de la photo pourrait ne pas être gérée au niveau des projets)
+
+---
+
+class: inverse, center, middle
+
+# Packrat
+
+---
+
+class: center, middle
 
 background-image: url("pics/packrat-combine.jpg")
 background-size: cover
@@ -51,43 +238,482 @@ Image credit: [Jennifer Buxton](http://braymere.blogspot.com/2013/02/pack-rats.h
 
 ---
 
-class: inverse, center, middle
+background-image: url("pics/package-packrat.pdf")
+background-size: 80%
+background-position: 50% 80%
 
-# Gestion classique des paquetages en R
-
-
----
-
-class: inverse, center, middle
-
-# Packrat
-
----
-
-background-image: url("pics/packrat-combine.jpg")
-background-size: cover
+# Accès aux paquetages
 
 ???
 
-Image credit: [Jennifer Buxton](http://braymere.blogspot.com/2013/02/pack-rats.html)
+---
 
+class: center, middle
+
+background-image: url("pics/barney-thumbs-up.gif")
+background-size: cover
 
 ---
 
 class: inverse, center, middle
 
-# Packrat + RStudio = 👍
+# Comment ça marche?
+
+---
+
+# Répertoires créés par `packrat`
+
+- `packrat/lib/`  
+ Installation des paquetages requis du projet
+ 
+- `packrat/lib-ext/`  
+ Installation des paquetages externes (utilisateur)
+ 
+- `packrat/lib-R/`  
+ Liens symboliques vers les paquetages de la distribution de `R`
+
+- `packrat/src/`  
+ Fichiers sources pour installer les paquetages requis
+
+---
+
+# Fichiers créés par `packrat`
+
+- `packrat/packrat.lock`  
+ Information sur les paquetages requis
+
+- `packrat/packrat.opts`  
+ Options du paquetage `packrat`
+
+- `packrat/init.R`  
+ Le script pour passer en mode `packrat`
+
+- `.Rprofile`  
+ Le script lancé automatiquement à l'ouverture de `R` qui appelle `packrat/init.R`
+
+---
+
+# `packrat/packrat.lock`
+
+```{r, packrat-lock, eval=FALSE}
+PackratFormat: 1.4
+PackratVersion: 0.4.9.1
+RVersion: 3.5.0
+Repos: CRAN=https://cran.rstudio.com/
+  
+[...]
+  
+Package: Rcpp
+Source: CRAN
+Version: 0.12.17
+Hash: d2eff4634ccd7aca030c540ad805ac4a
+
+[...]
+
+Package: callr
+Source: CRAN
+Version: 2.0.4
+Hash: ae3d74ab94396fc7f6b879f17fb71a12
+Requires: R6, processx
+
+[...]
+```
+
+---
+
+# `packrat/packrat.opts`
+
+```{r, packrat-opts, eval=FALSE}
+auto.snapshot: FALSE
+use.cache: FALSE
+print.banner.on.startup: auto
+vcs.ignore.lib: TRUE
+vcs.ignore.src: FALSE
+external.packages: 
+local.repos: 
+load.external.packages.on.startup: TRUE
+ignored.packages: 
+ignored.directories:
+    data
+    inst
+quiet.package.installation: TRUE
+snapshot.recommended.packages: FALSE
+snapshot.fields:
+    Imports
+    Depends
+    LinkingTo
+```
+
+---
+
+# `init()`
+
+1. Création de la librairie de projet
+
+2. Photo des paquetages utilisés
+
+3. Téléchargement des sources
+
+4. Installation des paquetages
+
+5. Redémarrage de la session `R` en mode `packrat`
+
+---
+
+# `snapshot()`
+
+1. Recherche des paquetages utilisés dans le projet
+
+2. Prise d'une photo (incluant la version exacte des paquetages)
+
+3. Téléchargement des sources
+
+???
+
+- Exceptions pour la photo des paquetages : paquetages de priorité *base* ou *recommended*
+- Pour toute cette section, je présente le comportement par défaut, on peut le modifier en jouant avec les paramètres
+
+---
+
+# `restore()`
+
+1. Lecture de la photo créée par `snapshot()`
+
+2. Téléchargement des sources manquantes
+
+3. Suppression des paquetages absents
+
+4. Mise à jour des paquetages n'ayant pas la même version
+
+5. Installation des paquetages manquants
+
+6. Redémarrage de la session `R`
+
+???
+
+- On utilise généralement cette fonction pour trois principaux rôles :
+ - *Hydrate* : Installer les paquetages requis lorsqu'on copie le projet sur une nouvelle machine
+ - *Sync* : Appliquer les changements apportés par un collaborateur qui aurait pris une nouvelle photo
+ - *Rollback* : Retourner à une version stable antérieure lorsqu'une mise à jour tourne mal
+
+---
+
+# `clean()`
+
+1. Recherche des paquetages utilisés dans le projet
+
+2. Évaluation des dépendances des paquetages
+
+3. Suppression des paquetages non requis
+
+???
+
+- Sert à réduire le nombre de dépendances pour le projet
+- La phase d'exploration amène souvent le développeur à essayer différentes solutions qui peuvent requérir plusieurs paquetages
+- Lorsque la phase d'exploration est terminée, on supprime les dépendances non nécessaires
+- Plus on restrient les requis, plus le projet est efficace
+
+---
+
+# `bundle()` / `unbundle()`
+
+1. Compresse les fichiers en format `*.tar.gz`
+
+2. Décompresse les fichiers `*.tar.gz`
+
+???
+
+- Facilite la collaboration en partageant un fichier unique
+
+- Les fichiers peuvent être décompressés avec la fonction `unbundle()` de `packrat`, avec la fonction `untar()` de `utils` ou avec la majorité des implantations `tar` des différents systèmes d'exploitation
+
+---
+
+# `on()` / `off()`
+
+1. Permet d'activer ou désactiver le mode `packrat`
+
+2. Ne supprime pas la photo actuelle ou les librarires du projet
+
+---
+
+# Quelques options intéressantes
+
+- `auto.snapshot` : Photos automatiques lorsque les paquetages requis changent
+
+- `use.cache` : Installation des paquetages en cache globale et partage entre les projets
+
+- `external.packages` : Paquetages de l'utilisateurs à attacher
+
+- `local.repos` : Entrepôt local de sources
+
+- `ignored.packages` : Paquetages ignorés par `packrat`
+
+- `ignored.directories` : Répertoires ignorés pour les recherches de dépendances
+
+???
+
+- Les options sont passées à l'aide de la fonction `set_opts()`
+
+- Cas classiques pour `external.packages` : `devtools`, `knitr`, `xaringan`
 
 ---
 
 class: inverse, center, middle
 
-# Packrat + Git = 👍
+# Exemple d'application
+
+???
+
+Prendre note que cet exemple n'est pas générée à même la présentation puisque ma présentation en soi utilise déjà le mode `packrat`. J'ai donc généré l'exemple dans une session `R` vanille qui n'utilise pas le mode `packrat` et copié les résultats en sortie dans la présentation.
+
+---
+
+# Exemple d'application
+
+On commence par afficher les libraries qui sont attachées à la session active.
+
+```{r, example-1, eval=FALSE}
+.libPaths()
+```
+```
+## [1] "/Library/Frameworks/R.framework/Versions/3.5/Resources/library"
+```
+
+---
+
+# Exemple d'application (suite)
+
+On passe en mode `packrat`.
+
+```{r, example-2, eval=FALSE}
+library(packrat)
+init()
+```
+```
+## Initializing packrat project in directory:
+## - "example"
+## 
+## Adding these packages to packrat:
+##             _        
+##     packrat   0.4.9-3
+## 
+## Fetching sources for packrat (0.4.9-3) ... OK (CRAN current)
+## Snapshot written to 'example/packrat/packrat.lock'
+## Installing packrat (0.4.9-3) ... 
+##   OK (downloaded binary)
+## Initialization complete!
+## 
+## Restarting R session...
+```
+
+---
+
+# Exemple d'application (suite)
+
+On regarde à nouveau les libraries attachées à la session active.
+
+```{r, example-3, eval=FALSE}
+.libPaths()
+```
+```
+## [1] "example/packrat/lib/x86_64-apple-darwin15.6.0/3.5.0"    
+## [2] "example/packrat/lib-ext/x86_64-apple-darwin15.6.0/3.5.0"
+## [3] "example/packrat/lib-R/x86_64-apple-darwin15.6.0/3.5.0"
+```
+
+À ce moment, les librairies du projet sont à jour.
+
+```{r, example-4, eval=FALSE}
+status()
+```
+```
+## Up to date.
+```
+
+---
+
+# Exemple d'application (suite)
+
+On installe un nouveau paquetage, on vient l'attacher à notre environnement et on regarde à nouveau le statut des librairies de projet.
+```{r, example-5, eval=FALSE}
+install.packages("data.table")
+library(data.table)
+status()
+```
+```
+## The following packages have been updated in your library, but have 
+## not been recorded in packrat:
+##                  library   packrat
+##     data.table    1.11.4        NA
+## 
+## Use packrat::snapshot() to record these packages in packrat.
+```
+
+---
+
+# Exemple d'application (suite)
+
+Tel que suggéré par la fonction `status()`, on prend une nouvelle photo des libraries de projet en appelant la fonction `snapshot()`.
+
+```{r, example-6, eval=FALSE}
+snapshot()
+```
+```
+## Adding these packages to packrat:
+##                _       
+##     data.table   1.11.4
+## 
+## Fetching sources for data.table (1.11.4) ... OK (CRAN current)
+## Snapshot written to 'example/packrat/packrat.lock'
+```
+
+Les libraries du projet sont à jour à nouveau!
+```{r, example-7, eval=FALSE}
+status()
+```
+```
+## Up to date.
+```
+
+---
+
+# Exemple d'application (suite)
+
+On simule un contexte de travail collaboratif où un nouvel utilisateur voudrait contribuer au projet.
+
+1. On ferme la session `R`
+
+2. On supprime les libraries du projet (en gardant les sources)
+
+3. On relance `R` dans le répertoire du projet.
+
+---
+
+# Exemple d'application (suite)
+
+```
+## Packrat is not installed in the local library -- attempting to 
+## bootstrap an installation...
+## > Installing packrat into project private library:
+## - 'packrat/lib/x86_64-apple-darwin15.6.0/3.5.0'
+## * installing *source* package ‘packrat’ ...
+## ** package ‘packrat’ successfully unpacked and MD5 sums checked
+## ** R
+## ** inst
+## ** byte-compile and prepare package for lazy loading
+## ** help
+## *** installing help indices
+## ** building package indices
+## ** testing if installed package can be loaded
+## * DONE (packrat)
+## > Attaching packrat
+## > Restoring library
+## > Packrat bootstrap successfully completed. Restarting R and 
+## entering packrat mode...
+## 
+## Restarting R session...
+```
+
+---
+
+# Exemple d'application (suite)
+
+On vérifie si les librairies du projet sont à jour.
+
+```{r, example-8, eval=FALSE}
+status()
+```
+```
+## The following packages are used in your code, tracked by packrat, 
+## but no longer present in your library:
+##                    from   to
+##     data.table   1.11.4   NA
+## 
+## Use packrat::restore() to restore these libraries.
+```
+
+---
+
+# Exemple d'application (suite)
+
+On utilise la fonction `restore()` pour resynchroniser les librairies du projet.
+
+```{r, example-9, eval=FALSE}
+restore()
+```
+```
+## Installing data.table (1.11.4) ... 
+## 	OK (downloaded binary)
+```
+
+On revérifie le statut des librairies du projet.
+```{r, example-10, eval=FALSE}
+status()
+```
+```
+## Up to date.
+```
+
+Et voilà!
+
+???
+
+- On voit que l'installation a été faite en téléchargeant les fichiers binaires sur le CRAN puisque la version utilisée est la plus récente. Si on avait utilisé une version ancienne, les fichiers binaires n'auraient pas été disponibles sur le CRAN et `packrat` aurait procédé à une installation en compilant les sources.
+- Évidemment, pour procéder à une installation en compilant les sources, il faut que le système d'exploitation ait les outils nécessaires pour être capable de compiler les paquetages.
 
 ---
 
 class: inverse, center, middle
 
-# Packrat + RSGit GiRStudio 👍👍👍
+# Packrat + Git + RStudio = <i class="fa fa-thumbs-up" aria-hidden="true"></i>
 
+---
+
+# Considérations importantes pour l'utilisation avec Git
+
+- On devrait toujours inclure
+ - La photo produite par `packrat`
+ - Les fichier `packrat/init.R` et `.Rprofile`
+
+- `vcs.ignore.lib` : Ignorer les librairies du projet dans la gestion des versions?
+
+- `vcs.ignore.src` : Ignorer les sources des librairies du projet dans la gestion des versions?
+
+???
+
+- Ça dépend des situations
+- Même serveur central : On peut inclure les librairies de projet
+- Différents systèmes d'exploitation : On n'inclut que les sources, le système va compiler
+
+---
+
+background-image: url("pics/rstudio-new-project.png")
+background-size: 70%
+background-position: 50% 85%
+
+# Création d'un nouveau projet
+
+???
+
+- Cette option appelle automatiquement la fonction `init()` dès la création du nouveau projet.
+
+---
+
+background-image: url("pics/rstudio-project-options.png")
+background-size: 60%
+background-position: 50% 90%
+
+# Options du mode `packrat`
+
+---
+
+class: inverse, center, middle
+
+# Merci!
+
+<a href="mailto:jplecavalier@me.com"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; jplecavalier@me.com</a><br>
+<a href="https://www.linkedin.com/in/jplecavalier/"><i class="fa fa-linkedin-square fa-fw"></i>&nbsp; @jplecavalier</a><br>
+<a href="https://github.com/jplecavalier"><i class="fa fa-github fa-fw"></i>&nbsp; @jplecavalier</a><br>
+<a href="https://twitter.com/Lecavalier300"><i class="fa fa-twitter fa-fw"></i>&nbsp; @Lecavalier300</a><br>
 

@@ -1,0 +1,13 @@
+.title-slide {
+  background-image: url("pics/logo.png");
+  background-size: 40%;
+  background-position: 50% 85%;
+}
+
+.title-slide h1, h2, h3 {
+  text-align: center;
+}
+
+.title-slide .remark-slide-number {
+  display: none;
+}
