@@ -11,3 +11,7 @@
 .title-slide .remark-slide-number {
   display: none;
 }
+
+.small-caps {
+  font-variant: small-caps;
+}
